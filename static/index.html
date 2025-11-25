@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distributed Task Queue Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Distributed Task Queue</h1>
+            <p class="subtitle">Real-time Job Monitoring & Management</p>
+        </header>
+
+        <!-- Metrics Dashboard -->
+        <section class="metrics-section">
+            <h2>📊 System Metrics</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">📋</div>
+                    <div class="metric-value" id="metric-total">0</div>
+                    <div class="metric-label">Total Jobs</div>
+                </div>
+                <div class="metric-card pending">
+                    <div class="metric-icon">⏳</div>
+                    <div class="metric-value" id="metric-pending">0</div>
+                    <div class="metric-label">Pending</div>
+                </div>
+                <div class="metric-card running">
+                    <div class="metric-icon">⚡</div>
+                    <div class="metric-value" id="metric-running">0</div>
+                    <div class="metric-label">Running</div>
+                </div>
+                <div class="metric-card completed">
+                    <div class="metric-icon">✅</div>
+                    <div class="metric-value" id="metric-completed">0</div>
+                    <div class="metric-label">Completed</div>
+                </div>
+                <div class="metric-card failed">
+                    <div class="metric-icon">❌</div>
+                    <div class="metric-value" id="metric-failed">0</div>
+                    <div class="metric-label">Failed</div>
+                </div>
+                <div class="metric-card dlq">
+                    <div class="metric-icon">💀</div>
+                    <div class="metric-value" id="metric-dlq">0</div>
+                    <div class="metric-label">Dead Letter Queue</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🔄</div>
+                    <div class="metric-value" id="metric-retries">0</div>
+                    <div class="metric-label">Total Retries</div>
+                </div>
+                <div class="metric-card" id="connection-status">
+                    <div class="metric-icon">🔌</div>
+                    <div class="metric-value" id="ws-status">Connecting</div>
+                    <div class="metric-label">WebSocket</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Job Submission Form -->
+        <section class="submit-section">
+            <h2>➕ Submit New Job</h2>
+            <form id="job-form" class="job-form">
+                <div class="form-group">
+                    <label for="tenant-id">Tenant ID:</label>
+                    <input type="text" id="tenant-id" required placeholder="e.g., user123">
+                </div>
+                <div class="form-group">
+                    <label for="payload">Job Payload:</label>
+                    <textarea id="payload" required placeholder='{"task": "process_data", "data": "example"}'></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="idempotency-key">Idempotency Key (optional):</label>
+                    <input type="text" id="idempotency-key" placeholder="unique-key-123">
+                </div>
+                <div class="form-group">
+                    <label for="max-retries">Max Retries:</label>
+                    <input type="number" id="max-retries" value="3" min="0" max="10">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Job</button>
+            </form>
+            <div id="submit-message" class="message"></div>
+        </section>
+
+        <!-- Jobs List -->
+        <section class="jobs-section">
+            <div class="section-header">
+                <h2>📝 Job Queue</h2>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="pending">Pending</button>
+                    <button class="filter-btn" data-filter="running">Running</button>
+                    <button class="filter-btn" data-filter="done">Completed</button>
+                    <button class="filter-btn" data-filter="failed">Failed</button>
+                </div>
+            </div>
+            <div class="pagination-controls">
+                <div class="pagination-info">
+                    <span id="jobs-count">Showing 0 jobs</span>
+                </div>
+                <div class="pagination-size">
+                    <label>Jobs per page:</label>
+                    <select id="page-size">
+                        <option value="10">10</option>
+                        <option value="25" selected>25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+            </div>
+            <div id="jobs-container" class="jobs-container">
+                <div class="loading">Loading jobs...</div>
+            </div>
+            <div class="pagination-navigation">
+                <button id="prev-page" class="pagination-btn" disabled>← Previous</button>
+                <div class="pagination-pages" id="pagination-pages">
+                    <span class="page-number active">1</span>
+                </div>
+                <button id="next-page" class="pagination-btn" disabled>Next →</button>
+            </div>
+        </section>
+
+        <!-- Dead Letter Queue -->
+        <section class="dlq-section">
+            <h2>💀 Dead Letter Queue (DLQ)</h2>
+            <p class="section-description">Jobs that failed after maximum retry attempts</p>
+            <div id="dlq-container" class="jobs-container">
+                <div class="empty-state">No jobs in DLQ</div>
+            </div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
